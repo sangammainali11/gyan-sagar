@@ -1,0 +1,49 @@
+import { auth } from "@/lib/auth-helper";
+import { NextResponse } from "next/server";
+
+import { db } from "@/lib/db";
+
+export async function PUT(
+    req:Request,
+    { params }: { params: Promise<{ courseId:string }> }
+){
+  const { courseId } = await params;
+
+    try{
+        const {userId} = await auth();
+
+        if(!userId) {
+            return new NextResponse("Unauthotized", {status:401});
+        }
+        
+        const {list} = await req.json();
+
+        const ownCourse = await db.course.findUnique({
+            where:{
+                id:courseId,
+                userId:userId,
+            }
+        });
+
+        if(!ownCourse) {
+             return new NextResponse("Unauthotized", {status:401});
+        }
+
+        for(const item of list)  {
+            await db.chapter.update({
+                where:{
+                    id:item.id,
+                },
+                data:{
+                    position:item.position,
+                }
+            });
+        }
+
+        return new NextResponse("Success", {status:200});
+
+    } catch(error) {
+        console.log("[Reorder Error]",error);
+        return new NextResponse("Internal Error ", {status:500});
+    }
+}
