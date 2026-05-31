@@ -19,6 +19,12 @@ interface SearchPageProps {
 const SearchPage = async (props: SearchPageProps) => {
   const searchParams = await props.searchParams;
 
+  const { userId } = await auth();
+
+  if (!userId) {
+    return redirect("/");
+  }
+
   const categories = await db.category.findMany({
     orderBy: {
       name: "asc",
