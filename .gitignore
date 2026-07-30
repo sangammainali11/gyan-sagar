@@ -42,3 +42,8 @@ yarn-error.log*
 next-env.d.ts
 
 /lib/generated/prisma
+
+
+.sass-cache
+build_output.log
+sangammainali11/
